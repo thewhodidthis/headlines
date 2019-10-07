@@ -81,9 +81,9 @@ class Headlines extends HTMLElement {
         .filter(result => !!result)
         // Parse what's left
         .reduce((cargo, result) => {
-          try {
-            const tree = parser.parseFromString(result, 'text/xml')
+          const tree = parser.parseFromString(result, 'text/xml')
 
+          try {
             const { textContent: source } = tree.querySelector('title')
             const list = tree.querySelectorAll('item, entry')
 
