@@ -13,8 +13,8 @@ import Headlines from '@thewhodidthis/headlines'
 window.customElements.whenDefined('x-reader').then(() => {
     const reader = new Headlines(5000) // Set a 5s timeout
 
-    // Reflected, the `src` attribute is however unavailable for observing changes
-    reader.src = 'https://cors-anywhere.herokuapp.com/https://api.axios.com/feed/world/'
+    // Set feed url
+    reader.src = 'https://cors-anywhere.herokuapp.com/http://blog.kenperlin.com/?feed=rss'
 
     // Fetch and display
     document.body.appendChild(reader)
