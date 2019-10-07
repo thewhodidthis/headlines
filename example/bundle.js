@@ -6,7 +6,7 @@
       super();
 
       this.cutoff = cutoff;
-      this.pre = this.localName.split('-').shift();
+      this.pre = this.localName.split('-').join('');
       this.host = document.createElement('div');
 
       this.host.classList.add(`${this.pre}-host`);
@@ -142,8 +142,10 @@
     }
   }
 
-  window.customElements.whenDefined('x-x').then(() => {
-    const target = document.querySelector('x-x');
+  const name = 'x-feed';
+
+  window.customElements.whenDefined(name).then(() => {
+    const target = document.querySelector(name);
     const style = document.createElement('style');
 
     style.textContent = `
@@ -166,7 +168,7 @@
   });
 
   try {
-    window.customElements.define('x-x', Headlines);
+    window.customElements.define(name, Headlines);
   } catch (e) {
     console.log(e);
   }

@@ -1,7 +1,9 @@
 import Headlines from '../index.mjs'
 
-window.customElements.whenDefined('x-x').then(() => {
-  const target = document.querySelector('x-x')
+const name = 'x-feed'
+
+window.customElements.whenDefined(name).then(() => {
+  const target = document.querySelector(name)
   const style = document.createElement('style')
 
   style.textContent = `
@@ -24,7 +26,7 @@ window.customElements.whenDefined('x-x').then(() => {
 })
 
 try {
-  window.customElements.define('x-x', Headlines)
+  window.customElements.define(name, Headlines)
 } catch (e) {
   console.log(e)
 }
