@@ -5,9 +5,6 @@ window.customElements.whenDefined('x-x').then(() => {
   const style = document.createElement('style')
 
   style.textContent = `
-    a {
-      color: gray;
-    }
     a:hover {
       text-decoration: none;
     }
@@ -22,7 +19,7 @@ window.customElements.whenDefined('x-x').then(() => {
   target.shadowRoot.appendChild(style)
 
   target.addEventListener('headlines:progress', (e) => {
-    console.log(e.detail)
+    console.log('done fetching for', e.detail)
   })
 })
 
