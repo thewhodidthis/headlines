@@ -81,28 +81,32 @@ class Headlines extends HTMLElement {
         .filter(result => !!result)
         // Parse what's left
         .reduce((cargo, result) => {
-          const tree = parser.parseFromString(result, 'text/html')
+          try {
+            const tree = parser.parseFromString(result, 'text/xml')
 
-          const { textContent: source } = tree.querySelector('title')
-          const list = tree.querySelectorAll('item, entry')
+            const { textContent: source } = tree.querySelector('title')
+            const list = tree.querySelectorAll('item, entry')
 
-          // Convert from `NodeList` first
-          const data = Array.from(list)
-            .map((item) => {
-              const dateTag = item.querySelector('updated, published, pubDate')
-              const date = new Date(dateTag.textContent)
+            // Convert from `NodeList` first
+            const data = Array.from(list)
+              .map((item) => {
+                const dateTag = item.querySelector('updated, published, pubDate')
+                const date = new Date(dateTag.textContent)
 
-              const titleTag = item.querySelector('title, summary')
-              const title = titleTag.textContent.trim()
+                const titleTag = item.querySelector('title, summary')
+                const title = titleTag.textContent.trim()
 
-              const linkTag = item.querySelector('link')
-              const link = linkTag.getAttribute('href') || linkTag.textContent
+                const linkTag = item.querySelector('link')
+                const link = linkTag.getAttribute('href') || linkTag.textContent
 
-              return { date, title, link, source }
-            })
+                return { date, title, link, source }
+              })
 
-          // Flatten
-          return cargo.concat(data)
+            // Flatten
+            return cargo.concat(data)
+          } catch (e) {
+            return cargo
+          }
         }, [])
 
       if (output.length) {
