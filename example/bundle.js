@@ -84,6 +84,8 @@
           .filter(result => !!result)
           // Parse what's left
           .reduce((cargo, result) => {
+            // This won't throw, but error log unavoidable
+            // https://developer.mozilla.org/en-US/docs/Web/API/DOMParser#Parsing_XML
             const tree = parser.parseFromString(result, 'text/xml');
 
             try {
