@@ -5,7 +5,7 @@ class Headlines extends HTMLElement {
     super();
 
     this.cutoff = cutoff;
-    this.pre = this.localName.split('-').shift();
+    this.pre = this.localName.split('-').join('');
     this.host = document.createElement('div');
 
     this.host.classList.add(`${this.pre}-host`);
