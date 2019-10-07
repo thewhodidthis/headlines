@@ -158,8 +158,8 @@
 
     target.shadowRoot.appendChild(style);
 
-    target.addEventListener('headlines:progress', (e) => {
-      console.log('done fetching for', e.detail);
+    target.addEventListener('headlines:progress', () => {
+      document.querySelector('.spinner').remove();
     });
   });
 

@@ -4,10 +4,34 @@
     <meta charset="utf-8">
     <title>hacker news</title>
     <link rel="preload" href="bundle.js" as="script">
+    <style>
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .spinner::before {
+        animation: spin 0.6s linear infinite;
+        border-radius: 50%;
+        border: 2px solid gainsboro;
+        border-top-color: gray;
+        box-sizing: border-box;
+        content: "";
+        height: 30px;
+        left: 50%;
+        margin-left: -15px;
+        margin-top: -15px;
+        position: absolute;
+        top: 50%;
+        width: 30px;
+      }
+    </style>
   </head>
 
   <body>
-    <x-x src="https://cors-anywhere.herokuapp.com/https://news.ycombinator.com/rss">Loading...</x-x>
+    <div class="spinner"></div>
+    <x-x src="https://cors-anywhere.herokuapp.com/https://news.ycombinator.com/rss"></x-x>
 
     <noscript><small><em>please enable javascript</em></small></noscript>
     <script src="bundle.js"></script>
