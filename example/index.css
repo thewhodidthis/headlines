@@ -1,10 +1,12 @@
 html {
-  font: 16px/1.25;
+  font: 16px/1.25 arial, sans-serif;
 }
 
 body {
   box-sizing: border-box;
+  display: flex;
   margin: 0;
+  min-height: 100vh;
   overflow: hidden;
   padding: 0.5rem;
 }
@@ -23,16 +25,13 @@ small {
 }
 
 p {
-  font-family: arial, sans-serif;
   font-size: 0.875rem;
   margin: 0;
 }
 
 figure {
-  left: 50%;
-  margin: -180px 0 0 -320px;
-  position: absolute;
-  top: 50%;
+  margin: auto;
+  padding: 1.5rem 0 1rem;
 }
 
 figcaption {
