@@ -6,12 +6,9 @@ class Headlines extends HTMLElement {
 
     this.cutoff = cutoff;
     this.pre = this.localName.split('-').shift();
-
     this.host = document.createElement('div');
-    this.host.textContent = 'Loading...';
 
     this.host.classList.add(`${this.pre}-host`);
-
     this.attachShadow({ mode: 'open' }).appendChild(this.host);
   }
 
@@ -34,8 +31,10 @@ class Headlines extends HTMLElement {
     }
 
     window.customElements.whenDefined(localName).then(() => {
-      const extra = this.querySelectorAll(localName);
-      const feeds = Array.from([...extra, this])
+      const children = this.querySelectorAll(localName);
+
+      // Collect urls, discard if `src` missing
+      const feeds = Array.from([...children, this])
         .filter(o => o.hasAttribute('src'))
         .map(o => o.src);
 
@@ -62,14 +61,16 @@ class Headlines extends HTMLElement {
         controller.abort();
       }, this.cutoff);
 
+      const notify = () => {
+        const progress = new CustomEvent('headlines:progress', { detail: url });
+
+        this.dispatchEvent(progress);
+      };
+
       return fetch(url, { signal: controller.signal })
         .then(r => r.text())
         .catch(e => e)
-        .finally(() => {
-          const tick = new CustomEvent('headlines:progress', { detail: url });
-
-          this.dispatchEvent(tick);
-        })
+        .finally(notify)
     });
 
     try {
@@ -82,14 +83,13 @@ class Headlines extends HTMLElement {
         .filter(result => !!result)
         // Parse what's left
         .reduce((cargo, result) => {
-          const tree = parser.parseFromString(result, 'text/xml');
+          const tree = parser.parseFromString(result, 'text/html');
 
           const { textContent: source } = tree.querySelector('title');
           const list = tree.querySelectorAll('item, entry');
 
           // Convert from `NodeList` first
           const data = Array.from(list)
-            // Turn callback into user defined middleware passing `list`, `source`
             .map((item) => {
               const dateTag = item.querySelector('updated, published, pubDate');
               const date = new Date(dateTag.textContent);
@@ -111,7 +111,6 @@ class Headlines extends HTMLElement {
         this.host.innerHTML = output
           // Most recent first
           .sort((a, b) => b.date - a.date)
-          // Callback override?
           .map(({ date, link, title, source }) => `
             <p class="${this.pre}-paragraph">
               <a class="${this.pre}-anchor" href="${link}" title="${title}">${title}</a>
@@ -121,7 +120,6 @@ class Headlines extends HTMLElement {
               </small>
             </p>`
           )
-          // Stringify
           .join('');
       } else {
         throw Error('Nothing to display')
