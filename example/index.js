@@ -1,6 +1,6 @@
 import Headlines from '../index.mjs'
 
-const name = 'x-feed'
+const name = 'the-feed'
 
 window.customElements.whenDefined(name).then(() => {
   const target = document.querySelector(name)
