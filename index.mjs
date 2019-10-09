@@ -28,7 +28,8 @@ class Headlines extends HTMLElement {
       return
     }
 
-    window.customElements.whenDefined(localName).then(() => {
+    // Make sure fetching happens not before tag has context
+    if (this.isConnected) {
       const children = this.querySelectorAll(localName)
 
       // Collect feed urls, discard blanks
@@ -39,7 +40,7 @@ class Headlines extends HTMLElement {
       if (urls.length) {
         this.render(...urls)
       }
-    })
+    }
   }
 
   async render(...urls) {
