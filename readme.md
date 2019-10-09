@@ -7,11 +7,11 @@ npm i thewhodidthis/headlines
 ```
 
 ### Usage
-Need define own HTML tag and proxy any CORS protected sources
+Decoding happens client side, need proxy CORS protected sources therefore
 ```js
-import Headlines from '@thewhodidthis/headlines'
+import '@thewhodidthis/headlines'
 
-window.customElements.whenDefined('the-headlines').then(() => {
+window.customElements.whenDefined('is-headlines').then(() => {
     // Constructor available once tag added to custom element registry
     const reader = new Headlines(5000) // Override 10s default fetch request timeout
 
@@ -21,47 +21,42 @@ window.customElements.whenDefined('the-headlines').then(() => {
     // Fetch and display
     document.body.appendChild(reader)
 })
-
-try {
-    window.customElements.define('the-headlines', Headlines)
-} catch (e) {
-    console.log(e)
-}
 ```
 
-The following are equivalent in terms of markup,
+The following are equivalent producing exact same output,
 ```html
 <!-- mix items sorted by date -->
-<the-headlines src="https://api.axios.com/feed/world/">
-    <the-headlines src="http://blog.kenperlin.com/?feed=rss">
-        <the-headlines src="http://javascriptweekly.com/rss"></the-headlines>
-    </the-headlines>
-</the-headlines>
+<is-headlines src="https://api.axios.com/feed/world/">
+    <is-headlines src="http://blog.kenperlin.com/?feed=rss">
+        <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
+    </is-headlines>
+</is-headlines>
 
-<!-- same -->
-<the-headlines src="https://api.axios.com/feed/world/">
-    <the-headlines src="http://blog.kenperlin.com/?feed=rss"></the-headlines>
-    <the-headlines src="http://javascriptweekly.com/rss"></the-headlines>
-</the-headlines>
+<!-- less -->
+<is-headlines src="https://api.axios.com/feed/world/">
+    <is-headlines src="http://blog.kenperlin.com/?feed=rss"></is-headlines>
+    <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
+</is-headlines>
 
-<!-- same -->
-<the-headlines>
-    <the-headlines src="https://api.axios.com/feed/world/"></the-headlines>
-    <the-headlines src="http://blog.kenperlin.com/?feed=rss"></the-headlines>
-    <the-headlines src="http://javascriptweekly.com/rss"></the-headlines>
-</the-headlines>
+<!-- more -->
+<is-headlines>
+    <is-headlines src="https://api.axios.com/feed/world/"></is-headlines>
+    <is-headlines src="http://blog.kenperlin.com/?feed=rss"></is-headlines>
+    <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
+</is-headlines>
 ```
 
 This would result in duplicate requests + content,
 ```html
-<the-headlines>
-    <the-headlines src="http://javascriptweekly.com/rss"></the-headlines>
-    <the-headlines src="http://javascriptweekly.com/rss"></the-headlines>
-</the-headlines>
+<is-headlines>
+    <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
+    <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
+</is-headlines>
 ```
 
-Keep feeds separate,
+Each feed on a separate host,
 ```html
-<the-headlines src="http://blog.kenperlin.com/?feed=rss"></the-headlines>
-<the-headlines src="http://javascriptweekly.com/rss"></the-headlines>
+<is-headlines src="https://api.axios.com/feed/world/"></is-headlines>
+<is-headlines src="http://blog.kenperlin.com/?feed=rss"></is-headlines>
+<is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
 ```
