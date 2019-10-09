@@ -31,7 +31,8 @@
         return
       }
 
-      window.customElements.whenDefined(localName).then(() => {
+      // Make sure fetching happens not before tag has context
+      if (this.isConnected) {
         const children = this.querySelectorAll(localName);
 
         // Collect feed urls, discard blanks
@@ -42,7 +43,7 @@
         if (urls.length) {
           this.render(...urls);
         }
-      });
+      }
     }
 
     async render(...urls) {
@@ -147,31 +148,29 @@
 
   window.customElements.define('is-headlines', Headlines);
 
-  window.customElements.whenDefined('is-headlines').then(() => {
-    // No styles present by default
-    const style = document.createElement('style');
+  // No styles present by default
+  const style = document.createElement('style');
 
-    // All template tags feature self-decriptive namespaced class names if need be
-    style.textContent = `
-    a:hover {
-      text-decoration: none;
-    }
-    p:first-child {
-      margin-top: auto;
-    }
-    p:last-child {
-      margin-bottom: auto;
-    }
-  `;
+  // All template tags feature self-decriptive namespaced class names if need be
+  style.textContent = `
+  a:hover {
+    text-decoration: none;
+  }
+  p:first-child {
+    margin-top: auto;
+  }
+  p:last-child {
+    margin-bottom: auto;
+  }
+`;
 
-    // Inline scoped css, adding via `link` also possible
-    document.querySelector('is-headlines').shadowRoot.appendChild(style);
+  // Inline scoped css, adding via `link` also possible
+  document.querySelector('is-headlines').shadowRoot.appendChild(style);
 
-    // Does bubble
-    document.addEventListener('headlines:fetch:end', () => {
-      // Done loading, cleanup
-      document.querySelector('.spinner').remove();
-    });
+  // Does bubble
+  document.addEventListener('headlines:fetch:end', () => {
+    // Done loading, cleanup
+    document.querySelector('.spinner').remove();
   });
 
 }());
