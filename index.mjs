@@ -1,12 +1,12 @@
 class Headlines extends HTMLElement {
-  constructor(cutoff = 100 * 100) {
+  constructor(timeout = 100 * 100, namespace) {
     super()
 
-    this.cutoff = cutoff
-    this.pre = this.localName.split('-').join('')
+    this.timeout = timeout
+    this.ns = namespace || this.localName
     this.host = document.createElement('div')
 
-    this.host.classList.add(`${this.pre}-host`)
+    this.host.classList.add(`${this.ns}-host`)
     this.attachShadow({ mode: 'open' }).appendChild(this.host)
   }
 
@@ -31,18 +31,18 @@ class Headlines extends HTMLElement {
     window.customElements.whenDefined(localName).then(() => {
       const children = this.querySelectorAll(localName)
 
-      // Collect urls, discard if `src` missing
-      const feeds = Array.from([...children, this])
+      // Collect feed urls, discard blanks
+      const urls = Array.from([...children, this])
         .filter(o => o.hasAttribute('src'))
         .map(o => o.src)
 
-      if (feeds.length) {
-        this.render(...feeds)
+      if (urls.length) {
+        this.render(...urls)
       }
     })
   }
 
-  async render(...feeds) {
+  async render(...urls) {
     const parser = new DOMParser()
     const controller = new AbortController()
     const { format } = new Intl.DateTimeFormat('en-US', {
@@ -53,22 +53,25 @@ class Headlines extends HTMLElement {
       minute: 'numeric'
     })
 
-    const promises = feeds.map((url) => {
+    const promises = urls.map((url) => {
       const timer = setTimeout(() => {
         clearTimeout(timer)
         controller.abort()
-      }, this.cutoff)
+      }, this.timeout)
 
-      const notify = () => {
-        const progress = new CustomEvent('headlines:progress', { detail: url })
+      const props = { detail: url, bubbles: true }
+      const start = new CustomEvent('headlines:fetch:start', props)
+      const end = new CustomEvent('headlines:fetch:end', props)
 
-        this.dispatchEvent(progress)
-      }
+      this.dispatchEvent(start)
 
       return fetch(url, { signal: controller.signal })
+        // Check for HTTP errors?
         .then(r => r.text())
         .catch(e => e)
-        .finally(notify)
+        .finally(() => {
+          this.dispatchEvent(end)
+        })
     })
 
     try {
@@ -116,11 +119,11 @@ class Headlines extends HTMLElement {
           // Most recent first
           .sort((a, b) => b.date - a.date)
           .map(({ date, link, title, source }) => `
-            <p class="${this.pre}-paragraph">
-              <a class="${this.pre}-anchor" href="${link}" title="${title}">${title}</a>
-              <br class="${this.pre}-break">
-              <small class="${this.pre}-small">
-                <time class="${this.pre}-time" datetime="${date}">${format(date)}</time> - ${source}
+            <p class="${this.ns}-paragraph">
+              <a class="${this.ns}-anchor" href="${link}" title="${title}">${title}</a>
+              <br class="${this.ns}-break">
+              <small class="${this.ns}-small">
+                <time class="${this.ns}-time" datetime="${date}">${format(date)}</time> - ${source}
               </small>
             </p>`
           )
@@ -130,13 +133,15 @@ class Headlines extends HTMLElement {
       }
     } catch (e) {
       this.host.innerHTML = `
-        <p class="${this.pre}-paragraph ${this.pre}-paragraph--fail">
-          <samp class="${this.pre}-sample">
-            <small class="${this.pre}-small">Sorry: ${e.message}</small>
+        <p class="${this.ns}-paragraph ${this.ns}-paragraph--fail">
+          <samp class="${this.ns}-sample">
+            <small class="${this.ns}-small">Sorry: ${e.message}</small>
           </samp>
         </p>`
     }
   }
 }
+
+window.customElements.define('is-headlines', Headlines)
 
 export default Headlines
