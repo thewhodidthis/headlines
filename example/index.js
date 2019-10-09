@@ -1,6 +1,6 @@
 import Headlines from '../index.mjs'
 
-const name = 'the-feed'
+const name = 'the-news'
 
 window.customElements.whenDefined(name).then(() => {
   const target = document.querySelector(name)
@@ -20,8 +20,12 @@ window.customElements.whenDefined(name).then(() => {
 
   target.shadowRoot.appendChild(style)
 
-  target.addEventListener('headlines:progress', () => {
-    document.querySelector('.spinner').remove()
+  target.addEventListener('headlines:end', () => {
+    try {
+      document.querySelector('.spinner').remove()
+    } catch (e) {
+      console.log(e)
+    }
   })
 })
 
