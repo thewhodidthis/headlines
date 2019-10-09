@@ -1,11 +1,10 @@
-import Headlines from '../index.mjs'
+import '../index.mjs'
 
-const name = 'the-news'
-
-window.customElements.whenDefined(name).then(() => {
-  const target = document.querySelector(name)
+window.customElements.whenDefined('is-headlines').then(() => {
+  // No styles present by default
   const style = document.createElement('style')
 
+  // All template tags feature self-decriptive namespaced class names if need be
   style.textContent = `
     a:hover {
       text-decoration: none;
@@ -18,19 +17,12 @@ window.customElements.whenDefined(name).then(() => {
     }
   `
 
-  target.shadowRoot.appendChild(style)
+  // Inline scoped css, adding via `link` also possible
+  document.querySelector('is-headlines').shadowRoot.appendChild(style)
 
-  target.addEventListener('headlines:end', () => {
-    try {
-      document.querySelector('.spinner').remove()
-    } catch (e) {
-      console.log(e)
-    }
+  // Does bubble
+  document.addEventListener('headlines:fetch:end', () => {
+    // Done loading, cleanup
+    document.querySelector('.spinner').remove()
   })
 })
-
-try {
-  window.customElements.define(name, Headlines)
-} catch (e) {
-  console.log(e)
-}
