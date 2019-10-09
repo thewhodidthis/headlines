@@ -46,17 +46,17 @@ The following are equivalent producing exact same output,
 </is-headlines>
 ```
 
+Each feed on a separate host,
+```html
+<is-headlines src="https://api.axios.com/feed/world/"></is-headlines>
+<is-headlines src="http://blog.kenperlin.com/?feed=rss"></is-headlines>
+<is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
+```
+
 This would result in duplicate requests + content,
 ```html
 <is-headlines>
     <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
     <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
 </is-headlines>
-```
-
-Each feed on a separate host,
-```html
-<is-headlines src="https://api.axios.com/feed/world/"></is-headlines>
-<is-headlines src="http://blog.kenperlin.com/?feed=rss"></is-headlines>
-<is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
 ```
