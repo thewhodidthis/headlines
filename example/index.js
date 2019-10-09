@@ -20,7 +20,7 @@ style.textContent = `
 document.querySelector('is-headlines').shadowRoot.appendChild(style)
 
 // Does bubble
-document.addEventListener('headlines:fetch:end', () => {
+document.addEventListener('headlines:progress', () => {
   // Done loading, cleanup
   document.querySelector('.spinner').remove()
 })

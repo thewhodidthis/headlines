@@ -63,18 +63,14 @@
           controller.abort();
         }, this.timeout);
 
-        const props = { detail: url, bubbles: true };
-        const start = new CustomEvent('headlines:fetch:start', props);
-        const end = new CustomEvent('headlines:fetch:end', props);
-
-        this.dispatchEvent(start);
-
         return fetch(url, { signal: controller.signal })
-          // Check for HTTP errors?
           .then(r => r.text())
           .catch(e => e)
           .finally(() => {
-            this.dispatchEvent(end);
+            // Always
+            const progress = new CustomEvent('headlines:progress', { detail: url, bubbles: true });
+
+            this.dispatchEvent(progress);
           })
       });
 
@@ -168,7 +164,7 @@
   document.querySelector('is-headlines').shadowRoot.appendChild(style);
 
   // Does bubble
-  document.addEventListener('headlines:fetch:end', () => {
+  document.addEventListener('headlines:progress', () => {
     // Done loading, cleanup
     document.querySelector('.spinner').remove();
   });
