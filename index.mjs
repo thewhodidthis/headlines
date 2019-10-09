@@ -61,7 +61,13 @@ class Headlines extends HTMLElement {
       }, this.timeout)
 
       return fetch(url, { signal: controller.signal })
-        .then(r => r.text())
+        .then((response) => {
+          if (response.ok) {
+            return response.text()
+          }
+
+          throw Error('Not OK')
+        })
         .catch(e => e)
         .finally(() => {
           // Always
@@ -82,7 +88,6 @@ class Headlines extends HTMLElement {
         // Parse what's left
         .reduce((cargo, result) => {
           // This won't throw, but error log unavoidable
-          // https://developer.mozilla.org/en-US/docs/Web/API/DOMParser#Parsing_XML
           const tree = parser.parseFromString(result, 'text/xml')
 
           try {
