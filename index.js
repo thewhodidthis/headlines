@@ -37,7 +37,7 @@ class Headlines extends HTMLElement {
       // Collect feed urls, discard blanks
       const urls = Array.from([...children, this])
         .filter(o => o.hasAttribute('src'))
-        .map(o => o.src);
+        .map(o => o.getAttribute('src'));
 
       if (urls.length) {
         this.render(...urls);
