@@ -77,8 +77,11 @@ class Headlines extends HTMLElement {
     // Base headline wrap
     const host = document.createElement('div')
 
+    // Class name prefix
+    const { ns } = this
+
     // For identifying existing if any
-    host.className = `${this.ns}-host`
+    host.className = `${ns}-host`
 
     try {
       const results = await Promise.all(promises)
@@ -121,11 +124,11 @@ class Headlines extends HTMLElement {
           // Most recent first
           .sort((a, b) => b.date - a.date)
           .map(({ date, link, title, source }) => `
-            <p class="${this.ns}-paragraph">
-              <a class="${this.ns}-anchor" href="${link}" title="${title}">${title}</a>
-              <br class="${this.ns}-break">
-              <small class="${this.ns}-small">
-                <time class="${this.ns}-time" datetime="${date}">${format(date)}</time> - ${source}
+            <p class="${ns}-paragraph">
+              <a class="${ns}-anchor" href="${link}" title="${title}">${title}</a>
+              <br class="${ns}-break">
+              <small class="${ns}-small">
+                <time class="${ns}-time" datetime="${date}">${format(date)}</time> - ${source}
               </small>
             </p>`
           )
@@ -135,9 +138,9 @@ class Headlines extends HTMLElement {
       }
     } catch (e) {
       host.innerHTML = `
-        <p class="${this.ns}-paragraph ${this.ns}-paragraph--fail">
-          <samp class="${this.ns}-sample">
-            <small class="${this.ns}-small">Sorry: ${e.message}</small>
+        <p class="${ns}-paragraph ${ns}-paragraph--fail">
+          <samp class="${ns}-sample">
+            <small class="${ns}-small">Sorry: ${e.message}</small>
           </samp>
         </p>`
     }
