@@ -6,10 +6,8 @@ class Headlines extends HTMLElement {
 
     this.timeout = timeout;
     this.ns = namespace || this.localName;
-    this.host = document.createElement('div');
 
-    this.host.classList.add(`${this.ns}-host`);
-    this.attachShadow({ mode: 'open' }).appendChild(this.host);
+    this.attachShadow({ mode: 'open' });
   }
 
   get src() {
@@ -23,21 +21,19 @@ class Headlines extends HTMLElement {
   }
 
   connectedCallback() {
-    const { parentNode, localName } = this;
-
     // Allow nesting: exclude child elements of the same type
-    if (parentNode && parentNode.localName === localName) {
+    if (this.parentNode && this.parentNode.localName === this.localName) {
       return
     }
 
-    // Make sure fetching happens not before tag has context
+    // Make sure fetching avoided unless tag has context
     if (this.isConnected) {
-      const children = this.querySelectorAll(localName);
+      const children = this.querySelectorAll(this.localName);
 
       // Collect feed urls, discard blanks
       const urls = Array.from([...children, this])
-        .filter(o => o.hasAttribute('src'))
-        .map(o => o.getAttribute('src'));
+        .filter(child => child.hasAttribute('src'))
+        .map(child => child.getAttribute('src'));
 
       if (urls.length) {
         this.render(...urls);
@@ -46,6 +42,7 @@ class Headlines extends HTMLElement {
   }
 
   async render(...urls) {
+    const dateFrom = from => new Date(from);
     const parser = new DOMParser();
     const controller = new AbortController();
     const { format } = new Intl.DateTimeFormat('en-US', {
@@ -79,9 +76,14 @@ class Headlines extends HTMLElement {
         })
     });
 
+    // Base headline wrap
+    const host = document.createElement('div');
+
+    // For identifying existing if any
+    host.className = `${this.ns}-host`;
+
     try {
       const results = await Promise.all(promises);
-
       const output = results
         // Drop errors
         .filter(result => !(result instanceof Error))
@@ -90,36 +92,34 @@ class Headlines extends HTMLElement {
         // Parse what's left
         .reduce((cargo, result) => {
           // This won't throw, but error log unavoidable
-          const tree = parser.parseFromString(result, 'text/xml');
+          const doc = parser.parseFromString(result, 'text/xml');
+          const children = doc.querySelectorAll('item, entry');
 
-          try {
-            const { textContent: source } = tree.querySelector('title');
-            const list = tree.querySelectorAll('item, entry');
+          const sourceTag = doc.querySelector('title');
+          const source = sourceTag && sourceTag.textContent;
 
-            // Convert from `NodeList` first
-            const data = Array.from(list)
-              .map((item) => {
-                const dateTag = item.querySelector('updated, published, pubDate');
-                const date = new Date(dateTag.textContent);
+          // Convert from `NodeList` first
+          const data = Array.from(children)
+            .map((child) => {
+              const dateTag = child.querySelector('updated, published, pubDate');
+              const date = dateTag && dateFrom(dateTag.textContent);
 
-                const titleTag = item.querySelector('title, summary');
-                const title = titleTag.textContent.trim();
+              const linkTag = child.querySelector('link');
+              const link = linkTag && (linkTag.getAttribute('href') || linkTag.textContent);
 
-                const linkTag = item.querySelector('link');
-                const link = linkTag.getAttribute('href') || linkTag.textContent;
+              const titleTag = child.querySelector('title, summary');
+              const title = titleTag && titleTag.textContent.trim();
 
-                return { date, title, link, source }
-              });
+              // Expect these values to be `null` if corresponding tags missing
+              return { date, link, source, title }
+            });
 
-            // Flatten
-            return cargo.concat(data)
-          } catch (e) {
-            return cargo
-          }
+          // Flatten
+          return cargo.concat(data)
         }, []);
 
       if (output.length) {
-        this.host.innerHTML = output
+        host.innerHTML = output
           // Most recent first
           .sort((a, b) => b.date - a.date)
           .map(({ date, link, title, source }) => `
@@ -136,12 +136,21 @@ class Headlines extends HTMLElement {
         throw Error('Nothing to display')
       }
     } catch (e) {
-      this.host.innerHTML = `
+      host.innerHTML = `
         <p class="${this.ns}-paragraph ${this.ns}-paragraph--fail">
           <samp class="${this.ns}-sample">
             <small class="${this.ns}-small">Sorry: ${e.message}</small>
           </samp>
         </p>`;
+    }
+
+    // Allow a single host only
+    const hostMaybe = this.shadowRoot.querySelector(`.${host.className}`);
+
+    if (hostMaybe) {
+      this.shadowRoot.replaceChild(host, hostMaybe);
+    } else {
+      this.shadowRoot.appendChild(host);
     }
   }
 }
