@@ -32,17 +32,17 @@
         const children = this.querySelectorAll(this.localName);
 
         // Collect feed urls, discard blanks
-        const urls = Array.from([...children, this])
+        const assets = Array.from([...children, this])
           .filter(child => child.hasAttribute('src'))
           .map(child => child.getAttribute('src'));
 
-        if (urls.length) {
-          this.render(...urls);
+        if (assets.length) {
+          this.render(...assets);
         }
       }
     }
 
-    async render(...urls) {
+    async render(...assets) {
       const dateFrom = from => new Date(from);
       const parser = new DOMParser();
       const controller = new AbortController();
@@ -54,7 +54,7 @@
         minute: 'numeric'
       });
 
-      const promises = urls.map((url) => {
+      const promises = assets.map((url) => {
         const timer = setTimeout(() => {
           clearTimeout(timer);
           controller.abort();
