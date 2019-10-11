@@ -53,24 +53,29 @@ class Headlines extends HTMLElement {
       minute: 'numeric'
     });
 
-    const promises = assets.map((url) => {
+    // Collect download promises for each asset for running in parallel
+    const promises = assets.map((asset) => {
+      // Guard against unresponsive calls
       const timer = setTimeout(() => {
         clearTimeout(timer);
         controller.abort();
       }, this.timeout);
 
-      return fetch(url, { signal: controller.signal })
+      return fetch(asset, { signal: controller.signal })
         .then((response) => {
           if (response.ok) {
             return response.text()
           }
 
+          // Add http errors
           throw Error('Not OK')
         })
+        // To be filtered out once all promises resolve
         .catch(e => e)
+        // Let clients know fetch complete
         .finally(() => {
           // Always
-          const progress = new CustomEvent('headlines:progress', { detail: url, bubbles: true });
+          const progress = new CustomEvent('headlines:progress', { detail: asset, bubbles: true });
 
           this.dispatchEvent(progress);
         })
