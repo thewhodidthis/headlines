@@ -9,7 +9,7 @@ equal
   .test(typeof Headlines, 'function')
 
 try {
-  window.customElements.define('x-headlines', Headlines)
+  window.customElements.define('just-headlines', Headlines)
 } catch (e) {
   ok
     .describe('is defined')
@@ -23,7 +23,7 @@ ok
 equal
   .describe('will default')
   .test((new Headlines()).timeout, 100 * 100)
-  .test((new Headlines()).ns, 'is-headlines')
+  .test((new Headlines()).ns, 'just-headlines')
   .describe('will reset timeout')
   .test((new Headlines(5000)).timeout, 5000)
   .describe('will reset namespace', 'done checking constructor')

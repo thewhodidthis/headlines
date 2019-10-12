@@ -11,7 +11,7 @@ Decoding happens client side, need proxy CORS protected sources therefore
 ```js
 import '@thewhodidthis/headlines'
 
-window.customElements.whenDefined('is-headlines').then(() => {
+window.customElements.whenDefined('just-headlines').then(() => {
     // Constructor available once tag added to custom element registry
     const reader = new Headlines(5000) // Override 10s default fetch request timeout
 
@@ -26,37 +26,37 @@ window.customElements.whenDefined('is-headlines').then(() => {
 The following are equivalent producing exact same output,
 ```html
 <!-- mix items sorted by date -->
-<is-headlines src="https://api.axios.com/feed/world/">
-    <is-headlines src="http://blog.kenperlin.com/?feed=rss">
-        <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
-    </is-headlines>
-</is-headlines>
+<just-headlines src="#">
+    <just-headlines src="##">
+        <just-headlines src="###"></just-headlines>
+    </just-headlines>
+</just-headlines>
 
 <!-- less -->
-<is-headlines src="https://api.axios.com/feed/world/">
-    <is-headlines src="http://blog.kenperlin.com/?feed=rss"></is-headlines>
-    <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
-</is-headlines>
+<just-headlines src="#">
+    <just-headlines src="##"></just-headlines>
+    <just-headlines src="###"></just-headlines>
+</just-headlines>
 
 <!-- more -->
-<is-headlines>
-    <is-headlines src="https://api.axios.com/feed/world/"></is-headlines>
-    <is-headlines src="http://blog.kenperlin.com/?feed=rss"></is-headlines>
-    <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
-</is-headlines>
+<just-headlines>
+    <just-headlines src="###"></just-headlines>
+    <just-headlines src="##"></just-headlines>
+    <just-headlines src="#"></just-headlines>
+</just-headlines>
 ```
 
 Each feed on a separate host,
 ```html
-<is-headlines src="https://api.axios.com/feed/world/"></is-headlines>
-<is-headlines src="http://blog.kenperlin.com/?feed=rss"></is-headlines>
-<is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
+<just-headlines src="#"></just-headlines>
+<just-headlines src="##"></just-headlines>
+<just-headlines src="###"></just-headlines>
 ```
 
 This would result in duplicate requests + content,
 ```html
-<is-headlines>
-    <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
-    <is-headlines src="http://javascriptweekly.com/rss"></is-headlines>
-</is-headlines>
+<just-headlines>
+    <just-headlines src="http://javascriptweekly.com/rss"></just-headlines>
+    <just-headlines src="http://javascriptweekly.com/rss"></just-headlines>
+</just-headlines>
 ```

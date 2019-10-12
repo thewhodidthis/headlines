@@ -17,7 +17,7 @@ style.textContent = `
 `
 
 // Inline scoped css, adding via `link` also possible
-document.querySelector('is-headlines').shadowRoot.appendChild(style)
+document.querySelector('just-headlines').shadowRoot.appendChild(style)
 
 // Does bubble
 document.addEventListener('headlines:progress', () => {

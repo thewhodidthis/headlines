@@ -165,7 +165,7 @@
     }
   }
 
-  window.customElements.define('is-headlines', Headlines);
+  window.customElements.define('just-headlines', Headlines);
 
   // No styles present by default
   const style = document.createElement('style');
@@ -184,7 +184,7 @@
 `;
 
   // Inline scoped css, adding via `link` also possible
-  document.querySelector('is-headlines').shadowRoot.appendChild(style);
+  document.querySelector('just-headlines').shadowRoot.appendChild(style);
 
   // Does bubble
   document.addEventListener('headlines:progress', () => {

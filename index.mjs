@@ -162,6 +162,6 @@ class Headlines extends HTMLElement {
   }
 }
 
-window.customElements.define('is-headlines', Headlines)
+window.customElements.define('just-headlines', Headlines)
 
 export default Headlines
