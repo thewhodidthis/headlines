@@ -61,9 +61,10 @@ class Headlines extends HTMLElement {
 
       return fetch(asset, { signal: controller.signal })
         .then((response) => {
-          const mimeTypeMaybe = response.headers && response.headers.get('Content-Type')
+          const contentType = response.headers && response.headers.get('Content-Type')
+          const matches = RegExp('text|xml').test(contentType)
 
-          if (response.ok && mimeTypeMaybe.includes('xml')) {
+          if (response.ok && matches) {
             return response.text()
           }
 
