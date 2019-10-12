@@ -73,7 +73,7 @@
 
             return Promise.reject(response)
           })
-          // To be filtered out once all promises resolve
+          // To be filtered out once all promises get answered
           .catch(e => e)
           // Let clients know fetch complete
           .finally(() => {
