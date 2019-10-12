@@ -64,12 +64,13 @@
 
         return fetch(asset, { signal: controller.signal })
           .then((response) => {
-            if (response.ok) {
+            const mimeTypeMaybe = response.headers && response.headers.get('Content-Type');
+
+            if (response.ok && mimeTypeMaybe.includes('xml')) {
               return response.text()
             }
 
-            // Add http errors
-            throw Error('Not OK')
+            return Promise.reject(response)
           })
           // To be filtered out once all promises resolve
           .catch(e => e)
