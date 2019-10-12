@@ -56,7 +56,7 @@ Each feed on a separate host,
 This would result in duplicate requests + content,
 ```html
 <just-headlines>
-    <just-headlines src="http://javascriptweekly.com/rss"></just-headlines>
-    <just-headlines src="http://javascriptweekly.com/rss"></just-headlines>
+    <just-headlines src="#"></just-headlines>
+    <just-headlines src="#"></just-headlines>
 </just-headlines>
 ```
