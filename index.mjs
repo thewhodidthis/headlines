@@ -27,8 +27,10 @@ class Headlines extends HTMLElement {
     // Make sure fetching avoided unless tag has context
     if (this.isConnected) {
       // Collect `src` urls, including self
-      const children = this.querySelectorAll(`${this.localName}[src]`)
-      const assets = Array.from([this, ...children]).map(o => o.getAttribute('src'))
+      const children = this.querySelectorAll(this.localName)
+      const assets = Array.from([this, ...children])
+        .filter(o => o.hasAttribute('src'))
+        .map(o => o.getAttribute('src'))
 
       if (assets.length) {
         this.render(...assets)
