@@ -32,13 +32,7 @@ The following are equivalent producing exact same output,
     </just-headlines>
 </just-headlines>
 
-<!-- less -->
-<just-headlines src="#">
-    <just-headlines src="##"></just-headlines>
-    <just-headlines src="###"></just-headlines>
-</just-headlines>
-
-<!-- more -->
+<!-- same -->
 <just-headlines>
     <just-headlines src="###"></just-headlines>
     <just-headlines src="##"></just-headlines>
@@ -48,9 +42,9 @@ The following are equivalent producing exact same output,
 
 Each feed on a separate host,
 ```html
-<just-headlines src="#"></just-headlines>
-<just-headlines src="##"></just-headlines>
 <just-headlines src="###"></just-headlines>
+<just-headlines src="##"></just-headlines>
+<just-headlines src="#"></just-headlines>
 ```
 
 This would result in duplicate requests + content,
