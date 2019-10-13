@@ -16,11 +16,13 @@ style.textContent = `
   }
 `
 
+const stage = document.querySelector('just-headlines')
+
 // Inline scoped css, adding via `link` also possible
-document.querySelector('just-headlines').shadowRoot.appendChild(style)
+stage.shadowRoot.appendChild(style)
 
 // Does bubble
-document.addEventListener('headlines:progress', () => {
+stage.addEventListener('progress', () => {
   // Done loading, cleanup
   document.querySelector('.spinner').remove()
 })

@@ -29,12 +29,9 @@
 
       // Make sure fetching avoided unless tag has context
       if (this.isConnected) {
-        const children = this.querySelectorAll(this.localName);
-
-        // Collect feed urls, discard blanks
-        const assets = Array.from([...children, this])
-          .filter(child => child.hasAttribute('src'))
-          .map(child => child.getAttribute('src'));
+        // Collect `src` urls, including self
+        const children = this.querySelectorAll(`${this.localName}[src]`);
+        const assets = Array.from([this, ...children]).map(o => o.getAttribute('src'));
 
         if (assets.length) {
           this.render(...assets);
@@ -42,6 +39,7 @@
       }
     }
 
+    // Separate to allow for dynamic updates
     async render(...assets) {
       const dateFrom = from => new Date(from);
       const parser = new DOMParser();
@@ -78,7 +76,7 @@
           // Let clients know fetch complete
           .finally(() => {
             // Always
-            const progress = new CustomEvent('headlines:progress', { detail: asset, bubbles: true });
+            const progress = new CustomEvent('progress', { detail: asset });
 
             this.dispatchEvent(progress);
           })
@@ -184,11 +182,13 @@
   }
 `;
 
+  const stage = document.querySelector('just-headlines');
+
   // Inline scoped css, adding via `link` also possible
-  document.querySelector('just-headlines').shadowRoot.appendChild(style);
+  stage.shadowRoot.appendChild(style);
 
   // Does bubble
-  document.addEventListener('headlines:progress', () => {
+  stage.addEventListener('progress', () => {
     // Done loading, cleanup
     document.querySelector('.spinner').remove();
   });
