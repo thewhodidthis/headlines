@@ -91,8 +91,8 @@ class Headlines extends HTMLElement {
     host.className = ns
 
     try {
-      const results = await Promise.all(promises)
-      const output = results
+      const resultsMaybe = await Promise.all(promises)
+      const results = resultsMaybe
         // Drop errors
         .filter(result => !(result instanceof Error))
         // Drop blanks
@@ -126,8 +126,8 @@ class Headlines extends HTMLElement {
           return cargo.concat(data)
         }, [])
 
-      if (output.length) {
-        host.innerHTML = output
+      if (results.length) {
+        host.innerHTML = results
           // Most recent first
           .sort((a, b) => b.date - a.date)
           .map(({ date, link, title, source }) => `
