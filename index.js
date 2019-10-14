@@ -83,14 +83,14 @@ class Headlines extends HTMLElement {
         })
     });
 
-    // Base headline wrap
-    const host = document.createElement('div');
-
     // Class name prefix
     const { ns } = this;
 
+    // Base headline wrap
+    const host = document.createElement('div');
+
     // For identifying existing if any
-    host.className = `${ns}-host`;
+    host.className = ns;
 
     try {
       const results = await Promise.all(promises);
