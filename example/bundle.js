@@ -2,11 +2,8 @@
   'use strict';
 
   class Headlines extends HTMLElement {
-    constructor(timeout = 100 * 100, namespace) {
+    constructor() {
       super();
-
-      this.timeout = timeout;
-      this.ns = namespace || this.localName;
 
       this.attachShadow({ mode: 'open' });
     }
@@ -21,8 +18,23 @@
       }
     }
 
+    // Used for aborting long fetch requests
+    get timeout() {
+      if (this.hasAttribute('timeout')) {
+        return this.getAttribute('timeout')
+      }
+
+      return 100 * 100
+    }
+
+    set timeout(v) {
+      if (v) {
+        this.setAttribute('timeout', v);
+      }
+    }
+
     connectedCallback() {
-      // Allow nesting: exclude child elements of the same type
+      // Allow nesting, exclude child elements of the same type
       if (this.parentNode && this.parentNode.localName === this.localName) {
         return
       }
@@ -36,12 +48,16 @@
           .map(o => o.getAttribute('src'));
 
         if (assets.length) {
-          this.render(...assets);
+          this.render(...assets).catch(({ message }) => {
+            const error = new ErrorEvent('error', { message });
+
+            this.dispatchEvent(error);
+          });
         }
       }
     }
 
-    // Separate to allow for dynamic updates
+    // Keep separate to allow for dynamic updates
     async render(...assets) {
       const dateFrom = from => new Date(from);
       const parser = new DOMParser();
@@ -71,91 +87,95 @@
               return response.text()
             }
 
+            // Anything other than 200 and of type
             return Promise.reject(response)
           })
           // To be filtered out once all promises get answered
           .catch(e => e)
-          // Let clients know fetch complete
+          // Successfull or not, let clients know fetch complete
           .finally(() => {
-            // Always
             const progress = new CustomEvent('progress', { detail: asset });
 
             this.dispatchEvent(progress);
           })
       });
 
-      // Class name prefix
-      const { ns } = this;
-
       // Base headline wrap
       const host = document.createElement('div');
 
       // For identifying existing if any
-      host.className = ns;
+      host.className = this.localName;
 
       try {
         const resultsMaybe = await Promise.all(promises);
         const results = resultsMaybe
-          // Drop errors
+          // Drop errors + blanks
           .filter(result => !(result instanceof Error))
-          // Drop blanks
           .filter(result => !!result)
-          // Parse what's left
-          .reduce((cargo, result) => {
-            // This won't throw, but error log unavoidable
-            const doc = parser.parseFromString(result, 'text/xml');
-            const children = doc.querySelectorAll('item, entry');
+          // Parse and flatten what's left
+          .reduce((cargo, text) => {
+            // This won't throw, but unavoidably error log
+            const root = parser.parseFromString(text, 'text/xml');
 
-            const sourceTag = doc.querySelector('title');
-            const source = sourceTag && sourceTag.textContent;
+            const { textContent: source } = root.querySelector('title') || {};
+            const children = root.querySelectorAll('item, entry');
 
-            // Convert from `NodeList` first
-            const data = Array.from(children)
-              .map((child) => {
-                const dateTag = child.querySelector('updated, published, pubDate');
-                const date = dateTag && dateFrom(dateTag.textContent);
+            const parse = (node) => {
+              // Feed title, same for all items / entries
+              const data = { source };
+              // Need a `pubDate` for RSS
+              const date = node.querySelector('updated, published, pubDate');
 
-                const linkTag = child.querySelector('link');
-                const link = linkTag && (linkTag.getAttribute('href') || linkTag.textContent);
+              if (date) {
+                data.date = dateFrom(date.textContent);
+              }
 
-                const titleTag = child.querySelector('title, summary');
-                const title = titleTag && titleTag.textContent.trim();
+              const link = node.querySelector('link');
 
-                // Expect these values to be `null` if corresponding tags missing
-                return { date, link, source, title }
-              });
+              if (link) {
+                // Expect an `href` attribute with atom feeds
+                data.link = link.getAttribute('href') || link.textContent;
+              }
 
-            // Flatten
-            return cargo.concat(data)
+              const title = node.querySelector('title, summary');
+
+              if (title) {
+                data.title = title.textContent.trim();
+              }
+
+              return data
+            };
+
+            return Array.from(children).map(parse).concat(cargo)
           }, []);
 
-        if (results.length) {
-          host.innerHTML = results
-            // Most recent first
-            .sort((a, b) => b.date - a.date)
-            .map(({ date, link, title, source }) => `
-            <p class="${ns}-paragraph">
-              <a class="${ns}-anchor" href="${link}" title="${title}">${title}</a>
-              <br class="${ns}-break">
-              <small class="${ns}-small">
-                <time class="${ns}-time" datetime="${date}">${format(date)}</time> - ${source}
-              </small>
-            </p>`
-            )
-            .join('');
-        } else {
-          throw Error('Nothing to display')
+        if (results.length === 0) {
+          throw Error('Nothing to show')
         }
+
+        host.innerHTML = results
+          // Most recent first
+          .sort((a, b) => b.date - a.date)
+          .map(({ date = '', link = '', title = link, source = '' }) => `
+          <p>
+            <a href="${link}" title="${title}">${title}</a>
+            <br>
+            <small>
+              <time datetime="${date}">${format(date)}</time> - ${source}
+            </small>
+          </p>`
+          )
+          .join('');
       } catch (e) {
         host.innerHTML = `
-        <p class="${ns}-paragraph ${ns}-paragraph--fail">
-          <samp class="${ns}-sample">
-            <small class="${ns}-small">Sorry: ${e.message}</small>
+        <p>
+          <samp>
+            <small>Sorry: ${e.message}</small>
           </samp>
         </p>`;
       }
 
-      // Allow a single host only
+      // Create or refresh existing host <div>
       const hostMaybe = this.shadowRoot.querySelector(`.${host.className}`);
 
       if (hostMaybe) {
@@ -166,7 +186,7 @@
     }
   }
 
-  window.customElements.define('just-headlines', Headlines);
+  customElements.define('just-headlines', Headlines);
 
   // No styles present by default
   const stage = document.querySelector('just-headlines');
@@ -191,6 +211,6 @@
   // Done loading
   stage.addEventListener('progress', () => {
     document.querySelector('.spinner').remove();
-  });
+  }, { once: true });
 
 }());
