@@ -7,13 +7,16 @@ npm i thewhodidthis/headlines
 ```
 
 ### Usage
-Decoding happens client side, need proxy CORS protected sources therefore
+Decoding happens client side, need proxy CORS protected resources therefore
 ```js
 import '@thewhodidthis/headlines'
 
 window.customElements.whenDefined('just-headlines').then(() => {
     // Constructor available once tag added to custom element registry
-    const reader = new Headlines(5000) // Override 10s default fetch request timeout
+    const reader = new Headlines() 
+
+    // Override 10s default fetch request timeout
+    reader.timeout = 5000
 
     // Set feed url
     reader.src = 'https://cors-anywhere.herokuapp.com/http://blog.kenperlin.com/?feed=rss'
