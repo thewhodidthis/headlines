@@ -23,4 +23,4 @@ stage.shadowRoot.appendChild(style)
 // Done loading
 stage.addEventListener('progress', () => {
   document.querySelector('.spinner').remove()
-})
+}, { once: true })
