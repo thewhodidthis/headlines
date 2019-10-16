@@ -131,7 +131,7 @@ const { ok, notOk, equal } = assert
 function testFeedBlob(type = 'text/xml') {
   const head = '<?xml version="1.0" encoding="utf-8"?>'
 
-  const rss = `
+  const rss2 = `
     <rss version="2.0">
       <channel>
         <title>RSS Title</title>
@@ -168,7 +168,7 @@ function testFeedBlob(type = 'text/xml') {
       </entry>
     </feed>`
 
-  const body = type.indexOf('rss') >= 0 ? rss : atom
+  const body = type.indexOf('rss') >= 0 ? rss2 : atom
 
   return new Blob([head, body], { type })
 }
