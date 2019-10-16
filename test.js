@@ -38,7 +38,7 @@ const { ok, notOk, equal } = assert
     .describe('will default timeout')
     .test(obj.timeout, 100 * 100)
 
-  obj.timeout = 5000
+  obj.timeout = timeout
 
   equal
     .describe('will reset timeout')
