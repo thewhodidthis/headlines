@@ -18,7 +18,7 @@
       }
     }
 
-    // Used for aborting long fetch requests
+    // For aborting long fetch requests
     get timeout() {
       if (this.hasAttribute('timeout')) {
         return this.getAttribute('timeout')
@@ -100,7 +100,7 @@
           })
       });
 
-      // Base wrap for all headlines
+      // Base wrap for all
       const host = document.createElement('div');
 
       try {
@@ -163,11 +163,11 @@
           </p>`
           )
           .join('');
-      } catch (e) {
+      } catch ({ message }) {
         host.innerHTML = `
         <p>
           <samp>
-            <small>Sorry: ${e.message}</small>
+            <small>Sorry: ${message}</small>
           </samp>
         </p>`;
       } finally {
