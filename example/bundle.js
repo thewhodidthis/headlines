@@ -43,12 +43,12 @@
       if (this.isConnected) {
         // Collect `src` urls, including self
         const children = this.querySelectorAll(this.localName);
-        const assets = Array.from([this, ...children])
+        const sources = Array.from([this, ...children])
           .filter(o => o.hasAttribute('src'))
           .map(o => o.getAttribute('src'));
 
-        if (assets.length) {
-          this.render(...assets).catch(({ message }) => {
+        if (sources.length) {
+          this.render(sources).catch(({ message }) => {
             const error = new ErrorEvent('error', { message });
 
             this.dispatchEvent(error);
@@ -58,7 +58,7 @@
     }
 
     // Keep separate to allow for dynamic updates
-    async render(...assets) {
+    async render(sources) {
       const dateFrom = from => new Date(from);
       const parser = new DOMParser();
       const controller = new AbortController();
@@ -71,14 +71,14 @@
       });
 
       // Collect download promises for each asset for running in parallel
-      const promises = assets.map((asset) => {
+      const promises = sources.map((source) => {
         // Guard against unresponsive calls
         const timer = setTimeout(() => {
           clearTimeout(timer);
           controller.abort();
         }, this.timeout);
 
-        return fetch(asset, { signal: controller.signal })
+        return fetch(source, { signal: controller.signal })
           .then((response) => {
             const contentType = response.headers && response.headers.get('Content-Type');
             const matches = RegExp('text|xml').test(contentType);
@@ -94,17 +94,14 @@
           .catch(e => e)
           // Successfull or not, let clients know fetch complete
           .finally(() => {
-            const progress = new CustomEvent('progress', { detail: asset });
+            const progress = new CustomEvent('progress', { detail: source });
 
             this.dispatchEvent(progress);
           })
       });
 
-      // Base headline wrap
+      // Base wrap for all headlines
       const host = document.createElement('div');
-
-      // For identifying existing if any
-      host.className = this.localName;
 
       try {
         const resultsMaybe = await Promise.all(promises);
@@ -117,36 +114,36 @@
             // This won't throw, but unavoidably error log
             const root = parser.parseFromString(text, 'text/xml');
 
+            // Feed title, same for all items / entries
             const { textContent: source } = root.querySelector('title') || {};
             const children = root.querySelectorAll('item, entry');
 
-            const parse = (node) => {
-              // Feed title, same for all items / entries
-              const data = { source };
-              // Need a `pubDate` for RSS
-              const date = node.querySelector('updated, published, pubDate');
+            return Array.from(children)
+              .map(function (node) {
+                // Need a `pubDate` for RSS
+                const date = node.querySelector('updated, published, pubDate');
 
-              if (date) {
-                data.date = dateFrom(date.textContent);
-              }
+                if (date) {
+                  this.date = dateFrom(date.textContent);
+                }
 
-              const link = node.querySelector('link');
+                const link = node.querySelector('link');
 
-              if (link) {
-                // Expect an `href` attribute with atom feeds
-                data.link = link.getAttribute('href') || link.textContent;
-              }
+                if (link) {
+                  // Expect an `href` attribute with atom feeds
+                  this.link = link.getAttribute('href') || link.textContent;
+                }
 
-              const title = node.querySelector('title, summary');
+                const title = node.querySelector('title, summary');
 
-              if (title) {
-                data.title = title.textContent.trim();
-              }
+                if (title) {
+                  this.title = title.textContent.trim();
+                }
 
-              return data
-            };
-
-            return Array.from(children).map(parse).concat(cargo)
+                // Copy
+                return Object.assign({}, this)
+              }, { source })
+              .concat(cargo)
           }, []);
 
         if (results.length === 0) {
@@ -173,20 +170,22 @@
             <small>Sorry: ${e.message}</small>
           </samp>
         </p>`;
+      } finally {
+        host.id = this.localName;
       }
 
-      // Create or refresh existing host <div>
-      const hostMaybe = this.shadowRoot.querySelector(`.${host.className}`);
+      // Create or refresh host <div>
+      const existingHost = this.shadowRoot.getElementById(host.id);
 
-      if (hostMaybe) {
-        this.shadowRoot.replaceChild(host, hostMaybe);
+      if (existingHost) {
+        this.shadowRoot.replaceChild(host, existingHost);
       } else {
         this.shadowRoot.appendChild(host);
       }
     }
   }
 
-  customElements.define('just-headlines', Headlines);
+  window.customElements.define('just-headlines', Headlines);
 
   // No styles present by default
   const stage = document.querySelector('just-headlines');
