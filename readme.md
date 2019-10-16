@@ -15,7 +15,7 @@ window.customElements.whenDefined('just-headlines').then(() => {
     // Constructor available once tag added to custom element registry
     const reader = new Headlines() 
 
-    // Override 10s default fetch request timeout
+    // Override 10s fetch default cutoff
     reader.timeout = 5000
 
     // Set feed url
