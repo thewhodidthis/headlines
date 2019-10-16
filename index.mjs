@@ -15,19 +15,18 @@ export default class Headlines extends HTMLElement {
     }
   }
 
-  // For aborting long fetch requests
   get timeout() {
-    if (this.hasAttribute('timeout')) {
-      return this.getAttribute('timeout')
-    }
+    const v = this.hasAttribute('timeout') ? this.getAttribute('timeout') : 100 * 100
 
-    return 100 * 100
+    return parseInt(v, 10)
   }
 
   set timeout(v) {
-    if (v) {
-      this.setAttribute('timeout', v)
+    if (isNaN(v)) {
+      return
     }
+
+    this.setAttribute('timeout', v)
   }
 
   connectedCallback() {
@@ -44,21 +43,19 @@ export default class Headlines extends HTMLElement {
         .filter(o => o.hasAttribute('src'))
         .map(o => o.getAttribute('src'))
 
-      if (sources.length) {
-        this.render(sources).catch(({ message }) => {
-          const error = new ErrorEvent('error', { message })
+      this.render(...sources).catch(({ message }) => {
+        const error = new ErrorEvent('error', { message })
 
-          this.dispatchEvent(error)
-        })
-      }
+        this.dispatchEvent(error)
+      })
     }
   }
 
   // Keep separate to allow for dynamic updates
-  async render(sources) {
-    const dateFrom = from => new Date(from)
-    const parser = new DOMParser()
+  async render(...sources) {
     const controller = new AbortController()
+    const parser = new DOMParser()
+    const dateFrom = from => new Date(from)
     const { format } = new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
@@ -67,7 +64,13 @@ export default class Headlines extends HTMLElement {
       minute: 'numeric'
     })
 
-    // Collect download promises for each asset for running in parallel
+    // Base content wrap
+    const host = document.createElement('div')
+
+    // Only a single host <div> in the shadow DOM
+    host.id = this.localName
+
+    // Collect download promises for each asset
     const promises = sources.map((source) => {
       // Guard against unresponsive calls
       const timer = setTimeout(() => {
@@ -84,21 +87,17 @@ export default class Headlines extends HTMLElement {
             return response.text()
           }
 
-          // Anything other than 200 and of type
           return Promise.reject(response)
         })
-        // To be filtered out once all promises get answered
+        // To be filtered out once all promises are answered
         .catch(e => e)
-        // Successfull or not, let clients know fetch complete
+        // Successful or not, let clients know fetch complete
         .finally(() => {
           const progress = new CustomEvent('progress', { detail: source })
 
           this.dispatchEvent(progress)
         })
     })
-
-    // Base wrap for all
-    const host = document.createElement('div')
 
     try {
       const resultsMaybe = await Promise.all(promises)
@@ -108,7 +107,7 @@ export default class Headlines extends HTMLElement {
         .filter(result => !!result)
         // Parse and flatten what's left
         .reduce((cargo, text) => {
-          // This won't throw, but unavoidably error log
+          // This won't throw, but unavoidably error log sometimes?
           const root = parser.parseFromString(text, 'text/xml')
 
           // Feed title, same for all items / entries
@@ -137,7 +136,7 @@ export default class Headlines extends HTMLElement {
                 this.title = title.textContent.trim()
               }
 
-              // Copy
+              // Need copy
               return Object.assign({}, this)
             }, { source })
             .concat(cargo)
@@ -160,24 +159,24 @@ export default class Headlines extends HTMLElement {
           </p>`
         )
         .join('')
-    } catch ({ message }) {
+    } catch (e) {
       host.innerHTML = `
         <p>
           <samp>
-            <small>Sorry: ${message}</small>
+            <small>Sorry: ${e.message}</small>
           </samp>
         </p>`
+
+      throw e
     } finally {
-      host.id = this.localName
-    }
+      // Append or replace host <div>
+      const hostMaybe = this.shadowRoot.getElementById(host.id)
 
-    // Create or refresh host <div>
-    const existingHost = this.shadowRoot.getElementById(host.id)
-
-    if (existingHost) {
-      this.shadowRoot.replaceChild(host, existingHost)
-    } else {
-      this.shadowRoot.appendChild(host)
+      if (hostMaybe) {
+        this.shadowRoot.replaceChild(host, hostMaybe)
+      } else {
+        this.shadowRoot.appendChild(host)
+      }
     }
   }
 }
