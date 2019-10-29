@@ -2,8 +2,9 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta description="HN headlines example">
     <title>hacker news</title>
-    <link rel="preload" href="bundle.js" as="script">
+    <script src="bundle.js" defer></script>
     <style>
       @keyframes spin {
         to {
@@ -32,8 +33,6 @@
   <body>
     <div class="spinner"></div>
     <just-headlines src="https://cors-anywhere.herokuapp.com/https://news.ycombinator.com/rss"></just-headlines>
-
-    <noscript><small><em>please enable javascript</em></small></noscript>
-    <script src="bundle.js"></script>
+    <noscript>need javascript for this thing to work please</noscript>
   </body>
 </html>
