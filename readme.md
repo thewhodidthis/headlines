@@ -57,3 +57,8 @@ This would result in duplicate requests + content,
   <just-headlines src="#"></just-headlines>
 </just-headlines>
 ```
+
+### Related reading
+
+- [The rise and demise of RSS](https://www.vice.com/en_us/article/a3mm4z/the-rise-and-demise-of-rss)
+- [It's time for an RSS revival](https://www.wired.com/story/rss-readers-feedly-inoreader-old-reader/)
