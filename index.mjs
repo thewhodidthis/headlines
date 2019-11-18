@@ -55,7 +55,6 @@ export default class Headlines extends HTMLElement {
   async render(...sources) {
     const controller = new AbortController()
     const parser = new DOMParser()
-    const dateFrom = from => new Date(from)
     const { format } = new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
@@ -120,7 +119,12 @@ export default class Headlines extends HTMLElement {
               const date = node.querySelector('updated, published, pubDate')
 
               if (date) {
-                this.date = dateFrom(date.textContent)
+                // For improper input like 'Thu, 11/14/2019 - 05:00' expect a return value of 'Invadid Date'
+                const d = new Date(date.textContent)
+
+                if (isFinite(d)) {
+                  this.date = d
+                }
               }
 
               const link = node.querySelector('link')
