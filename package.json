@@ -27,15 +27,14 @@
     "node": ">=6.11.0",
     "npm": ">=3.10.10"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@thewhodidthis/eslint-config": "latest",
-    "cutaway": "latest",
-    "eslint": "latest",
-    "kpow": "latest",
-    "rollup": "latest",
-    "rollup-config-x": "latest",
-    "tapeless": "latest"
+    "@thewhodidthis/eslint-config": "^0.0.17",
+    "cutaway": "^0.0.7",
+    "eslint": "^6.8.0",
+    "kpow": "^0.1.4",
+    "rollup": "^1.31.1",
+    "rollup-config-x": "^1.0.4",
+    "tapeless": "^0.0.9"
   },
   "keywords": [
     "headlines",
