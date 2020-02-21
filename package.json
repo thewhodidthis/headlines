@@ -15,10 +15,13 @@
     "type": "git",
     "url": "git+https://github.com/thewhodidthis/headlines.git"
   },
-  "license": "Unlicense",
-  "author": "sChzs BkgNns <sotirios.bakagiannis@gmail.com> (https://www.thewhodidthis.com)",
+  "license": "ISC",
+  "author": "Sotiri Bakagiannis <sotirios.bakagiannis@gmail.com> (http://thewhodidthis.com)",
   "main": "index",
   "module": "index.mjs",
+  "directories": {
+    "example": "example"
+  },
   "scripts": {
     "preexample": "eslint example/index.js",
     "example": "cd example; rollup -f iife -o bundle.js index.js",
@@ -30,6 +33,7 @@
   "eslintConfig": {
     "extends": "@thewhodidthis"
   },
+  "dependencies": {},
   "devDependencies": {
     "@thewhodidthis/eslint-config": "^0.0.17",
     "cutaway": "^0.0.7",
