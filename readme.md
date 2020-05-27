@@ -1,13 +1,20 @@
-> Helps read the news
+## about
 
-### Setup
+A feed reading, nestable custom [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/Window/customElements) using the [`Fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) and [`DOMParser`](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser) Web APIs.
+
+## setup
+
+Install the latest version from GitHub directly,
+
 ```sh
-# Fetch latest from github
+# Includes ES and CJS modules
 npm i thewhodidthis/headlines
 ```
 
-### Usage
-Decoding happens client side, need proxy CORS protected resources therefore
+## usage
+
+Decoding happens client side, need proxy [CORS](https://fetch.spec.whatwg.org/#http-cors-protocol) protected resources therefore. For example,
+
 ```js
 import '@thewhodidthis/headlines'
 
@@ -26,7 +33,8 @@ window.customElements.whenDefined('just-headlines').then(() => {
 })
 ```
 
-The following are equivalent producing exact same output,
+The following are equivalent producing exactly the same output,
+
 ```html
 <!-- mix items sorted by date -->
 <just-headlines src="#">
@@ -43,7 +51,8 @@ The following are equivalent producing exact same output,
 </just-headlines>
 ```
 
-Each feed on a separate host,
+Each feed on a separate host element,
+
 ```html
 <just-headlines src="###"></just-headlines>
 <just-headlines src="##"></just-headlines>
@@ -51,6 +60,7 @@ Each feed on a separate host,
 ```
 
 This would result in duplicate requests + content,
+
 ```html
 <just-headlines>
   <just-headlines src="#"></just-headlines>
@@ -58,6 +68,7 @@ This would result in duplicate requests + content,
 </just-headlines>
 ```
 
-### Context
-- https://www.vice.com/en_us/article/a3mm4z/the-rise-and-demise-of-rss[The rise and demise of RSS]
-- https://www.wired.com/story/rss-readers-feedly-inoreader-old-reader/[It's time for an RSS revival]
+## see also
+
+- [The rise and demise of RSS](https://www.vice.com/en_us/article/a3mm4z/the-rise-and-demise-of-rss/)
+- [It's time for an RSS revival](https://www.wired.com/story/rss-readers-feedly-inoreader-old-reader/)
