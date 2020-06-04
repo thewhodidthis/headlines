@@ -4,11 +4,11 @@ A feed reading, nestable custom [`HTMLElement`](https://developer.mozilla.org/en
 
 ## setup
 
-Install the latest version from GitHub directly,
+Fetch latest from GitHub directly:
 
 ```sh
-# Includes ES and CJS modules
-npm i thewhodidthis/headlines
+# Includes ESM and CJS versions
+npm install thewhodidthis/headlines
 ```
 
 ## usage
@@ -33,7 +33,7 @@ window.customElements.whenDefined('just-headlines').then(() => {
 })
 ```
 
-The following are equivalent producing exactly the same output,
+The following are equivalent producing exactly the same output:
 
 ```html
 <!-- mix items sorted by date -->
@@ -51,7 +51,7 @@ The following are equivalent producing exactly the same output,
 </just-headlines>
 ```
 
-Each feed on a separate host element,
+Each feed on a separate host element:
 
 ```html
 <just-headlines src="###"></just-headlines>
@@ -59,7 +59,7 @@ Each feed on a separate host element,
 <just-headlines src="#"></just-headlines>
 ```
 
-This would result in duplicate requests + content,
+Duplicate requests and content:
 
 ```html
 <just-headlines>
