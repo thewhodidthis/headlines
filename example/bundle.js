@@ -118,6 +118,9 @@
 
             return Array.from(children)
               .map(function (node) {
+                // Need copy
+                const result = Object.assign({}, this);
+
                 // Need a `pubDate` for RSS
                 const date = node.querySelector('updated, published, pubDate');
 
@@ -126,7 +129,7 @@
                   const d = new Date(date.textContent);
 
                   if (isFinite(d)) {
-                    this.date = d;
+                    result.date = d;
                   }
                 }
 
@@ -134,17 +137,16 @@
 
                 if (link) {
                   // Expect an `href` attribute with atom feeds
-                  this.link = link.getAttribute('href') || link.textContent;
+                  result.link = link.getAttribute('href') || link.textContent;
                 }
 
                 const title = node.querySelector('title, summary');
 
-                if (title) {
-                  this.title = title.textContent.trim();
+                if (title.textContent) {
+                  result.title = title.textContent.trim();
                 }
 
-                // Need copy
-                return Object.assign({}, this)
+                return result
               }, { source })
               .concat(cargo)
           }, []);
