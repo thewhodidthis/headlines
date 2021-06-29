@@ -4,10 +4,10 @@ A feed reading, nestable custom [`HTMLElement`](https://developer.mozilla.org/en
 
 ## setup
 
-Fetch latest from GitHub directly:
+Download from GitHub directly:
 
 ```sh
-# Includes ESM and CJS versions
+# Add to package.json
 npm install thewhodidthis/headlines
 ```
 
@@ -16,9 +16,9 @@ npm install thewhodidthis/headlines
 Decoding happens client side, need proxy [CORS](https://fetch.spec.whatwg.org/#http-cors-protocol) protected resources therefore. For example,
 
 ```js
-import '@thewhodidthis/headlines'
+import "@thewhodidthis/headlines"
 
-window.customElements.whenDefined('just-headlines').then(() => {
+window.customElements.whenDefined("just-headlines").then(() => {
   // Constructor available once tag added to custom element registry
   const reader = new Headlines()
 
@@ -26,7 +26,8 @@ window.customElements.whenDefined('just-headlines').then(() => {
   reader.timeout = 5000
 
   // Set feed url
-  reader.src = 'https://cors-anywhere.herokuapp.com/http://blog.kenperlin.com/?feed=rss'
+  reader.src =
+    "https://cors-anywhere.herokuapp.com/http://blog.kenperlin.com/?feed=rss"
 
   // Fetch and display
   document.body.appendChild(reader)
