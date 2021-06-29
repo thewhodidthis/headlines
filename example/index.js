@@ -1,8 +1,8 @@
-import '../index.mjs'
+import "../main.js"
 
 // No styles present by default
-const stage = document.querySelector('just-headlines')
-const style = document.createElement('style')
+const stage = document.querySelector("just-headlines")
+const style = document.createElement("style")
 
 // All template tags feature self-decriptive namespaced class names if need be
 style.textContent = `
@@ -21,6 +21,6 @@ style.textContent = `
 stage.shadowRoot.appendChild(style)
 
 // Done loading
-stage.addEventListener('progress', () => {
-  document.querySelector('.spinner').remove()
+stage.addEventListener("progress", () => {
+  document.querySelector(".spinner").remove()
 }, { once: true })
