@@ -1,134 +1,132 @@
-import 'cutaway'
-import { report, assert } from 'tapeless'
-import Headlines from './index.mjs'
+import "cutaway"
+import { assert, report } from "tapeless"
+import Headlines from "./main.js"
 
 const { ok, notOk, equal } = assert
-
 ;(async () => {
   const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
   const timeout = 5000
 
   equal
-    .describe('will export default class')
-    .test(typeof Headlines, 'function')
+    .describe("will export default class")
+    .test(typeof Headlines, "function")
 
   try {
-    customElements.define('just-headlines', Headlines)
+    customElements.define("just-headlines", Headlines)
   } catch (e) {
     ok
-      .describe('will define `&lt;just-headlines&gt;`')
+      .describe("will define `&lt;just-headlines&gt;`")
       .test(e)
   }
 
   ok
-    .describe('tag known')
-    .test(document.createElement('just-headlines') instanceof HTMLElement)
+    .describe("tag known")
+    .test(document.createElement("just-headlines") instanceof HTMLElement)
 
   notOk
-    .describe('tag not unknown')
-    .test(document.createElement('just-headlines') instanceof HTMLUnknownElement)
+    .describe("tag not unknown")
+    .test(document.createElement("just-headlines") instanceof HTMLUnknownElement)
 
   const obj = new Headlines()
 
   ok
-    .describe('will construct')
+    .describe("will construct")
     .test(obj instanceof Headlines)
 
   equal
-    .describe('will default timeout')
+    .describe("will default timeout")
     .test(obj.timeout, 100 * 100)
 
   obj.timeout = timeout
 
   equal
-    .describe('will reset timeout')
+    .describe("will reset timeout")
     .test(obj.timeout, timeout)
 
-  const tag = document.createElement('just-headlines')
+  const tag = document.createElement("just-headlines")
 
   const atom = testFeedBlob()
   const src = window.URL.createObjectURL(atom)
 
-  tag.style.display = 'none'
+  tag.style.display = "none"
   tag.src = src
   tag.timeout = 1
 
   equal
-    .describe('will reflect `src`')
-    .test(tag.src, tag.getAttribute('src'))
-    .describe('will reflect `timeout`')
-    .test(tag.timeout.toString(), tag.getAttribute('timeout'))
+    .describe("will reflect `src`")
+    .test(tag.src, tag.getAttribute("src"))
+    .describe("will reflect `timeout`")
+    .test(tag.timeout.toString(), tag.getAttribute("timeout"))
 
   document.body.appendChild(tag)
 
   ok
-    .describe('will connect')
+    .describe("will connect")
     .test(tag.isConnected)
 
-  tag.addEventListener('error', (e) => {
+  tag.addEventListener("error", (e) => {
     equal
-      .describe('will err')
-      .test(e.message, 'Nothing to show')
+      .describe("will err")
+      .test(e.message, "Nothing to show")
   })
 
-  tag.addEventListener('progress', (e) => {
-    const children = tag.shadowRoot.querySelectorAll('p')
+  tag.addEventListener("progress", (e) => {
+    const children = tag.shadowRoot.querySelectorAll("p")
 
     ok
-      .describe('will progress')
+      .describe("will progress")
       .test(true)
 
     notOk
-      .describe('host is empty at this point')
+      .describe("host is empty at this point")
       .test(children.length)
 
     equal
-      .describe('progress event detail matches feed source')
+      .describe("progress event detail matches feed source")
       .test(e.detail, tag.src)
   }, { once: true })
 
   // Force fetch abort
-  tag.setAttribute('timeout', 1)
+  tag.setAttribute("timeout", 1)
 
   await delay(tag.timeout + 1).then(() => {
-    const host = tag.shadowRoot.querySelector('div')
-    const children = host.querySelectorAll('p')
+    const host = tag.shadowRoot.querySelector("div")
+    const children = host.querySelectorAll("p")
 
     equal
-      .describe('will timeout')
+      .describe("will timeout")
       .test(children.length, 1)
 
-    notOk
-      .describe('host features error message')
-      .test(host.innerText.trim().indexOf('Sorry'))
+    equal
+      .describe("host features error message")
+      .test(host.innerText.trim().indexOf("Sorry"), -1)
   })
 
   // Restore
-  tag.setAttribute('timeout', 1000)
+  tag.setAttribute("timeout", 1000)
 
   try {
     await tag.render(tag.src, tag.src)
       .then(() => {
-        const host = tag.shadowRoot.querySelector('div')
-        const children = host.querySelectorAll('p')
+        const host = tag.shadowRoot.querySelector("div")
+        const children = host.querySelectorAll("p")
 
         equal
-          .describe('will parse multiple')
+          .describe("will parse multiple")
           .test(children.length, 2)
 
         ok
-          .describe('headline markup checks out')
-          .test(host.querySelector('p, a, date, time'))
+          .describe("headline markup checks out")
+          .test(host.querySelector("p, a, date, time"))
       })
   } catch (e) {
-    equal.test(e.message, 'Nothing to show')
+    equal.test(e.message, "Nothing to show")
   }
 
   report()
 })()
 
-/* eslint func-style: warn */
-function testFeedBlob(type = 'text/xml') {
+function testFeedBlob(type = "text/xml") {
   const head = '<?xml version="1.0" encoding="utf-8"?>'
 
   const rss2 = `
@@ -168,7 +166,7 @@ function testFeedBlob(type = 'text/xml') {
       </entry>
     </feed>`
 
-  const body = type.indexOf('rss') >= 0 ? rss2 : atom
+  const body = type.indexOf("rss") >= 0 ? rss2 : atom
 
   return new Blob([head, body], { type })
 }
