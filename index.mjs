@@ -22,7 +22,7 @@ export default class Headlines extends HTMLElement {
   }
 
   set timeout(v) {
-    if (isNaN(v)) {
+    if (Number.isNaN(v)) {
       return
     }
 
