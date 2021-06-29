@@ -2,21 +2,21 @@ export default class Headlines extends HTMLElement {
   constructor() {
     super()
 
-    this.attachShadow({ mode: 'open' })
+    this.attachShadow({ mode: "open" })
   }
 
   get src() {
-    return this.getAttribute('src')
+    return this.getAttribute("src")
   }
 
   set src(v) {
     if (v) {
-      this.setAttribute('src', v)
+      this.setAttribute("src", v)
     }
   }
 
   get timeout() {
-    const v = this.hasAttribute('timeout') ? this.getAttribute('timeout') : 100 * 100
+    const v = this.hasAttribute("timeout") ? this.getAttribute("timeout") : 100 * 100
 
     return parseInt(v, 10)
   }
@@ -26,7 +26,7 @@ export default class Headlines extends HTMLElement {
       return
     }
 
-    this.setAttribute('timeout', v)
+    this.setAttribute("timeout", v)
   }
 
   connectedCallback() {
@@ -40,11 +40,11 @@ export default class Headlines extends HTMLElement {
       // Collect `src` urls, including self
       const children = this.querySelectorAll(this.localName)
       const sources = Array.from([this, ...children])
-        .filter(o => o.hasAttribute('src'))
-        .map(o => o.getAttribute('src'))
+        .filter(o => o.hasAttribute("src"))
+        .map(o => o.getAttribute("src"))
 
       this.render(...sources).catch(({ message }) => {
-        const error = new ErrorEvent('error', { message })
+        const error = new ErrorEvent("error", { message })
 
         this.dispatchEvent(error)
       })
@@ -55,16 +55,16 @@ export default class Headlines extends HTMLElement {
   async render(...sources) {
     const controller = new AbortController()
     const parser = new DOMParser()
-    const { format } = new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
+    const { format } = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
       hour12: false,
-      hour: 'numeric',
-      minute: 'numeric'
+      hour: "numeric",
+      minute: "numeric",
     })
 
     // Base content wrap
-    const host = document.createElement('div')
+    const host = document.createElement("div")
 
     // Only a single host <div> in the shadow DOM
     host.id = this.localName
@@ -79,8 +79,8 @@ export default class Headlines extends HTMLElement {
 
       return fetch(source, { signal: controller.signal })
         .then((response) => {
-          const contentType = response.headers && response.headers.get('Content-Type')
-          const matches = RegExp('text|xml').test(contentType)
+          const contentType = response.headers && response.headers.get("Content-Type")
+          const matches = RegExp("text|xml").test(contentType)
 
           if (response.ok && matches) {
             return response.text()
@@ -92,7 +92,7 @@ export default class Headlines extends HTMLElement {
         .catch(e => e)
         // Successful or not, let clients know fetch complete
         .finally(() => {
-          const progress = new CustomEvent('progress', { detail: source })
+          const progress = new CustomEvent("progress", { detail: source })
 
           this.dispatchEvent(progress)
         })
@@ -107,19 +107,19 @@ export default class Headlines extends HTMLElement {
         // Parse and flatten what's left
         .reduce((cargo, text) => {
           // This won't throw, but unavoidably error log sometimes?
-          const root = parser.parseFromString(text, 'text/xml')
+          const root = parser.parseFromString(text, "text/xml")
 
           // Feed title, same for all items / entries
-          const { textContent: source } = root.querySelector('title') || {}
-          const children = root.querySelectorAll('item, entry')
+          const { textContent: source } = root.querySelector("title") || {}
+          const children = root.querySelectorAll("item, entry")
 
           return Array.from(children)
-            .map(function (node) {
+            .map(function(node) {
               // Need copy
               const result = Object.assign({}, this)
 
               // Need a `pubDate` for RSS
-              const date = node.querySelector('updated, published, pubDate')
+              const date = node.querySelector("updated, published, pubDate")
 
               if (date) {
                 // For improper input like 'Thu, 11/14/2019 - 05:00' expect a return value of 'Invadid Date'
@@ -130,14 +130,14 @@ export default class Headlines extends HTMLElement {
                 }
               }
 
-              const link = node.querySelector('link')
+              const link = node.querySelector("link")
 
               if (link) {
                 // Expect an `href` attribute with atom feeds
-                result.link = link.getAttribute('href') || link.textContent
+                result.link = link.getAttribute("href") || link.textContent
               }
 
-              const title = node.querySelector('title, summary')
+              const title = node.querySelector("title, summary")
 
               if (title.textContent) {
                 result.title = title.textContent.trim()
@@ -149,22 +149,21 @@ export default class Headlines extends HTMLElement {
         }, [])
 
       if (results.length === 0) {
-        throw Error('Nothing to show')
+        throw Error("Nothing to show")
       }
 
       host.innerHTML = results
         // Most recent first
         .sort((a, b) => b.date - a.date)
-        .map(({ date = '', link = '', title = link, source = '' }) => `
+        .map(({ date = "", link = "", title = link, source = "" }) => `
           <p>
             <a href="${link}" title="${title}">${title}</a>
             <br>
             <small>
               <time datetime="${date}">${format(date)}</time> - ${source}
             </small>
-          </p>`
-        )
-        .join('')
+          </p>`)
+        .join("")
     } catch (e) {
       host.innerHTML = `
         <p>
@@ -187,4 +186,4 @@ export default class Headlines extends HTMLElement {
   }
 }
 
-window.customElements.define('just-headlines', Headlines)
+window.customElements.define("just-headlines", Headlines)
