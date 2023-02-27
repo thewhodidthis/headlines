@@ -1,0 +1,90 @@
+// Helps format date objects.
+export const dateTimeFormat = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  hour12: false,
+  hour: "numeric",
+  minute: "numeric",
+})
+
+// Helps request feed content.
+export function downloader(timeout = 100 * 100) {
+  // Helps guard against unresponsive calls.
+  const controller = new AbortController()
+
+  return async (url = "", options = {}) => {
+    const timer = setTimeout(() => {
+      // Duck out.
+      controller.abort()
+      clearTimeout(timer)
+    }, timeout)
+
+    try {
+      const response = await fetch(url, {
+        signal: controller.signal,
+        ...options,
+      })
+
+      if (response.ok) {
+        const contentType = response?.headers.get("Content-Type")
+        const valid = RegExp("text|xml").test(contentType)
+
+        if (valid) {
+          return response
+        }
+
+        throw new Error("Invalid content type")
+      } else {
+        throw new Error("Unable to complete request")
+      }
+    } catch (e) {
+      // Forward to caller.
+      throw e
+    }
+  }
+}
+
+// Helps process feed content.
+export function parse(text = "") {
+  // Helps convert input into DOM nodes.
+  const parser = new DOMParser()
+
+  // This won't throw, but unavoidably error log sometimes?
+  const feed = parser.parseFromString(text, "text/xml")
+
+  // Get feed title, same for all entries.
+  const { textContent: source } = feed.querySelector("title") || {}
+  const entries = feed.querySelectorAll("item, entry")
+
+  // Collect attributes of interest for each entry.
+  return Array.from(entries).map((entry) => {
+    const result = { source }
+
+    // Need a `pubDate` for RSS.
+    const date = entry.querySelector("updated, published, pubDate")
+
+    if (date) {
+      // For improper input like 'Thu, 11/14/2019 - 05:00' expect a return value of 'Invadid Date'.
+      const d = new Date(date.textContent)
+
+      if (isFinite(d)) {
+        result.date = d
+      }
+    }
+
+    const link = entry.querySelector("link")
+
+    if (link) {
+      // Expect an `href` attribute with atom feeds.
+      result.link = link.getAttribute("href") || link.textContent
+    }
+
+    const title = entry.querySelector("title, summary")
+
+    if (title.textContent) {
+      result.title = title.textContent.trim()
+    }
+
+    return result
+  })
+}
