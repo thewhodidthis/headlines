@@ -52,8 +52,12 @@ export function parse(text = "") {
   // This won't throw, but unavoidably error log sometimes?
   const feed = parser.parseFromString(text, "text/xml")
 
-  // Get feed title, same for all entries.
-  const { textContent: source } = feed.querySelector("title") || {}
+  // Figure out feed title, same for all entries.
+  const t = feed.querySelector("title")
+  const l = feed.querySelector("link")
+  const { hostname } = new URL(l?.textContent)
+  const source = t?.textContent?.length ? t.textContent : hostname
+
   const entries = feed.querySelectorAll("item, entry")
 
   // Collect attributes of interest for each entry.
