@@ -55,9 +55,9 @@ export function parse(text = "") {
   // Figure out feed title, same for all entries.
   const t = feed.querySelector("title")
   const l = feed.querySelector("link")
-  const { hostname } = new URL(l?.textContent)
+  const u = l?.getAttribute("href") ?? l?.textContent
+  const { hostname } = new URL(u)
   const source = t?.textContent?.length ? t.textContent : hostname
-
   const entries = feed.querySelectorAll("item, entry")
 
   // Collect attributes of interest for each entry.
