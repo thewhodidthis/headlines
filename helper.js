@@ -48,19 +48,14 @@ export function downloader(timeout = 100 * 100) {
 export function parse(text = "") {
   // Helps convert input into DOM nodes.
   const parser = new DOMParser()
-
   // This won't throw, but unavoidably error log sometimes?
   const feed = parser.parseFromString(text, "text/xml")
-
-  // Figure out feed title, same for all entries.
-  const t = feed.querySelector("title")
-  const l = feed.querySelector("link")
-  const u = l?.getAttribute("href") ?? l?.textContent
-  const { hostname } = new URL(u)
-  const source = t?.textContent?.length ? t.textContent : hostname
+  // Collect any RSS and/or Atom posts.
   const entries = feed.querySelectorAll("item, entry")
+  // Name the feed, same for all results.
+  const source = sourcefinder(feed)
 
-  // Collect attributes of interest for each entry.
+  // Collect attributes of interest for each post.
   return Array.from(entries).map((entry) => {
     const result = { source }
 
@@ -79,7 +74,7 @@ export function parse(text = "") {
     const link = entry.querySelector("link")
 
     if (link) {
-      // Expect an `href` attribute with atom feeds.
+      // Expect an `href` attribute in Atom feeds.
       result.link = link.getAttribute("href") || link.textContent
     }
 
@@ -91,4 +86,21 @@ export function parse(text = "") {
 
     return result
   })
+}
+
+function sourcefinder(feed) {
+  const title = feed?.querySelector("title")
+
+  if (title?.textContent?.length) {
+    return title.textContent
+  }
+
+  try {
+    // Fall back to feed host, if title empty.
+    const link = feed?.querySelector("link")
+    const href = link?.getAttribute("href") ?? link?.textContent
+    const { hostname } = new URL(href)
+
+    return hostname
+  } catch {}
 }
