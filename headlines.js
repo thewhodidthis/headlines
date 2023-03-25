@@ -51,15 +51,14 @@ var headlines = (function() {
   function parse(text = "") {
     // Helps convert input into DOM nodes.
     const parser = new DOMParser()
-
     // This won't throw, but unavoidably error log sometimes?
     const feed = parser.parseFromString(text, "text/xml")
-
-    // Get feed title, same for all entries.
-    const { textContent: source } = feed.querySelector("title") || {}
+    // Collect any RSS and/or Atom posts.
     const entries = feed.querySelectorAll("item, entry")
+    // Name the feed, same for all results.
+    const source = sourcefinder(feed)
 
-    // Collect attributes of interest for each entry.
+    // Collect attributes of interest for each post.
     return Array.from(entries).map((entry) => {
       const result = { source }
 
@@ -78,7 +77,7 @@ var headlines = (function() {
       const link = entry.querySelector("link")
 
       if (link) {
-        // Expect an `href` attribute with atom feeds.
+        // Expect an `href` attribute in Atom feeds.
         result.link = link.getAttribute("href") || link.textContent
       }
 
@@ -90,6 +89,23 @@ var headlines = (function() {
 
       return result
     })
+  }
+
+  function sourcefinder(feed) {
+    const title = feed?.querySelector("title")
+
+    if (title?.textContent?.length) {
+      return title.textContent
+    }
+
+    try {
+      // Fall back to feed host, if title empty.
+      const link = feed?.querySelector("link")
+      const href = link?.getAttribute("href") ?? link?.textContent
+      const { hostname } = new URL(href)
+
+      return hostname
+    } catch {}
   }
 
   // Helps render RSS feeds.
