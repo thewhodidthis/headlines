@@ -1,6 +1,6 @@
 import { dateTimeFormat, downloader, parse } from "./helper.js"
 
-// Helps render RSS feeds.
+// Helps render news feeds.
 export default class Headlines extends HTMLElement {
   constructor() {
     super()
