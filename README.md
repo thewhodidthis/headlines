@@ -30,23 +30,23 @@ npm install thewhodidthis/headlines
 
 ## usage
 
-Decoding happens client side, need proxy [CORS](https://fetch.spec.whatwg.org/#http-cors-protocol) protected resources therefore. For example,
+Decoding happens client side, need proxy [CORS](https://fetch.spec.whatwg.org/#http-cors-protocol) protected resources therefore. For example:
 
 ```js
 import "@thewhodidthis/headlines"
 
-window.customElements.whenDefined("just-headlines").then(() => {
-  // Constructor available once tag added to custom element registry
+self.customElements.whenDefined("just-headlines").then(() => {
+  // Constructor available once tag added to custom element registry.
   const reader = new Headlines()
 
-  // Override 10s fetch default cutoff
+  // Override 10s fetch default cutoff.
   reader.timeout = 5000
 
-  // Set feed url
+  // Set feed url.
   reader.src =
     "https://cors-anywhere.herokuapp.com/http://blog.kenperlin.com/?feed=rss"
 
-  // Fetch and display
+  // Fetch and display.
   document.body.appendChild(reader)
 })
 ```
