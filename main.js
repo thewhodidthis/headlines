@@ -46,6 +46,7 @@ export default class Headlines extends HTMLElement {
     // Create a unique container.
     const wrap = document.createElement("div")
 
+    wrap.setAttribute("part", "wrap")
     wrap.setAttribute("id", localName)
 
     try {
@@ -84,8 +85,8 @@ export default class Headlines extends HTMLElement {
         .sort((a, b) => b.date - a.date)
         // HTML render results.
         .map(({ date = "", link = "", title = link, source = "" }) => range.createContextualFragment(`
-            <p>
-              <a href="${link}" title="${title}">${title}</a>
+            <p part="headline">
+              <a part="title" href="${link}" title="${title}">${title}</a>
               <br>
               <small>
                 <time datetime="${date}">${dateTimeFormat.format(date)}</time> - ${source}
