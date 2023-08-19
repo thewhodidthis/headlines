@@ -102,5 +102,7 @@ function sourcefinder(feed) {
     const { hostname } = new URL(href)
 
     return hostname
-  } catch {}
+  } catch (_) {
+    // Continue regardless of error.
+  }
 }
