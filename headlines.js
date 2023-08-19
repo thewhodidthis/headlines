@@ -105,10 +105,12 @@ var headlines = (function() {
       const { hostname } = new URL(href)
 
       return hostname
-    } catch {}
+    } catch (_) {
+      // Continue regardless of error.
+    }
   }
 
-  // Helps render RSS feeds.
+  // Helps render news feeds.
   class Headlines extends HTMLElement {
     constructor() {
       super()
@@ -154,6 +156,7 @@ var headlines = (function() {
       // Create a unique container.
       const wrap = document.createElement("div")
 
+      wrap.setAttribute("part", "wrap")
       wrap.setAttribute("id", localName)
 
       try {
@@ -194,8 +197,8 @@ var headlines = (function() {
           // HTML render results.
           .map(({ date = "", link = "", title = link, source = "" }) =>
             range.createContextualFragment(`
-            <p>
-              <a href="${link}" title="${title}">${title}</a>
+            <p part="headline">
+              <a part="title" href="${link}" title="${title}">${title}</a>
               <br>
               <small>
                 <time datetime="${date}">${dateTimeFormat.format(date)}</time> - ${source}
