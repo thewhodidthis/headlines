@@ -26,6 +26,18 @@
         top: 50%;
         width: 30px;
       }
+      @media (prefers-color-scheme: dark) {
+        html {
+          background: #1e1e1e;
+          color: #efefef;
+        }
+        a {
+          color: inherit;
+        }
+        just-headlines::part(title) {
+          color: inherit;
+        }
+      }
     </style>
   </head>
   <body>
