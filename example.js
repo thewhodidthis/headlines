@@ -21,6 +21,14 @@ style.textContent = `
 stage.shadowRoot.appendChild(style)
 
 // Done loading.
+stage.addEventListener("ready", () => {
+  const links = stage.shadowRoot.querySelectorAll("a")
+
+  links.forEach((link) => {
+    link.setAttribute("target", "_parent")
+  })
+})
+
 stage.addEventListener("progress", () => {
   document.querySelector(".spinner").remove()
-}, { once: true })
+}, { once: true, passive: true })
