@@ -84,7 +84,11 @@ var headlines = (function() {
       const title = entry.querySelector("title, summary")
 
       if (title.textContent) {
-        result.title = title.textContent.trim()
+        const span = document.createElement("span")
+
+        span.append(title.textContent.trim())
+
+        result.title = span.innerHTML
       }
 
       return result
