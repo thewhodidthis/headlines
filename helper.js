@@ -80,12 +80,8 @@ export function parse(text = "") {
 
     const title = entry.querySelector("title, summary")
 
-    if (title.textContent) {
-      const span = document.createElement("span")
-
-      span.append(title.textContent.trim())
-
-      result.title = span.innerHTML
+    if (title) {
+      result.title = title.textContent.trim()
     }
 
     return result
