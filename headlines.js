@@ -78,13 +78,13 @@ var headlines = (function() {
 
       if (link) {
         // Expect an `href` attribute in Atom feeds.
-        result.link = link.getAttribute("href") || link.textContent
+        result.link = esc(link.getAttribute("href") || link.textContent)
       }
 
       const title = entry.querySelector("title, summary")
 
       if (title) {
-        result.title = title.textContent.trim()
+        result.title = esc(title.textContent.trim())
       }
 
       return result
@@ -95,7 +95,7 @@ var headlines = (function() {
     const title = feed?.querySelector("title")
 
     if (title?.textContent?.length) {
-      return title.textContent
+      return esc(title.textContent)
     }
 
     try {
@@ -108,6 +108,18 @@ var headlines = (function() {
     } catch (_) {
       // Continue regardless of error.
     }
+  }
+
+  function esc(input = "") {
+    const t = document.createElement("textarea")
+
+    t.innerHTML = input
+
+    const s = document.createElement("span")
+
+    s.textContent = t.value
+
+    return s.innerHTML
   }
 
   // Helps render news feeds.
