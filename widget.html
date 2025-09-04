@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Hacker News example using the headlines.js module.">
+    <title>Hacker News</title>
+    <script src="example.js" type="module"></script>
+    <style>
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spinner::before {
+        animation: spin 0.6s linear infinite;
+        border-radius: 50%;
+        border: 2px solid gainsboro;
+        border-top-color: gray;
+        box-sizing: border-box;
+        content: "";
+        height: 30px;
+        left: 50%;
+        margin-left: -15px;
+        margin-top: -15px;
+        position: absolute;
+        top: 50%;
+        width: 30px;
+      }
+      @media (prefers-color-scheme: dark) {
+        html {
+          background: #1e1e1e;
+          color: #efefef;
+        }
+        a {
+          color: inherit;
+        }
+        just-headlines::part(title) {
+          color: inherit;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="spinner"></div>
+    <just-headlines src="https://thewhodidthis.com/proxy/?url=https://news.ycombinator.com/rss"></just-headlines>
+    <noscript>need javascript for this thing to work please</noscript>
+  </body>
+</html>
