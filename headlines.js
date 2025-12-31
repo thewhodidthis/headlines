@@ -227,17 +227,17 @@ var headlines = (function() {
             </p>`)
           )
 
-        if (items.length) {
-          // Update container.
-          wrap.append(...items)
-
-          const completeEvent = new CustomEvent("complete", { detail: items.length })
-
-          // Signal success.
-          host.dispatchEvent(completeEvent)
+        if (!items.length) {
+          throw new Error("Nothing to show")
         }
 
-        throw new Error("Nothing to show")
+        // Update container.
+        wrap.append(...items)
+
+        const completeEvent = new CustomEvent("complete", { detail: items.length })
+
+        // Signal success.
+        host.dispatchEvent(completeEvent)
       } catch ({ message }) {
         const item = range.createContextualFragment(`
         <p>
