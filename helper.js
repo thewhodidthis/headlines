@@ -48,15 +48,17 @@ export function downloader(timeout = 100 * 100) {
 export function parse(text = "") {
   // Helps convert input into DOM nodes.
   const parser = new DOMParser()
-  // This won't throw, but unavoidably error log sometimes?
+  // This may not throw, but unavoidably error log sometimes?
   const feed = parser.parseFromString(text, "text/xml")
   // Collect any RSS and/or Atom posts.
   const entries = feed.querySelectorAll("item, entry")
   // Name the feed, same for all results.
   const source = sourcefinder(feed)
+  // Convert node list entries into plain objects.
+  const map = new Map()
 
-  // Collect attributes of interest for each post.
-  return Array.from(entries).map((entry) => {
+  for (const entry of entries) {
+    // Already know this to exist.
     const result = { source }
 
     // Need a `pubDate` for RSS.
@@ -84,8 +86,15 @@ export function parse(text = "") {
       result.title = esc(title.textContent.trim())
     }
 
-    return result
-  })
+    // Attempt to filter out duplicates for each source.
+    try {
+      const key = JSON.stringify(result)
+
+      map.set(key, result)
+    } catch {}
+  }
+
+  return Array.from(map.values())
 }
 
 function sourcefinder(feed) {
