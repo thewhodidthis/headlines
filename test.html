@@ -54,7 +54,7 @@
         const atom = testFeedBlob()
         const src = window.URL.createObjectURL(atom)
 
-        tag.style.display = "none"
+        tag.hidden = true
         tag.src = src
         tag.timeout = 1
 
