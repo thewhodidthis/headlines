@@ -95,17 +95,17 @@ export default class Headlines extends HTMLElement {
           )
         )
 
-      if (!items.length) {
-        throw new Error("Nothing to show")
+      if (items.length) {
+        // Update container.
+        wrap.append(...items)
+
+        const completeEvent = new CustomEvent("complete", { detail: items.length })
+
+        // Signal success.
+        host.dispatchEvent(completeEvent)
       }
 
-      // Update container.
-      wrap.append(...items)
-
-      const completeEvent = new CustomEvent("complete", { detail: items.length })
-
-      // Signal success.
-      host.dispatchEvent(completeEvent)
+      throw new Error("Nothing to show")
     } catch ({ message }) {
       const item = range.createContextualFragment(`
         <p>
