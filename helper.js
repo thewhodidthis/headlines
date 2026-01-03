@@ -88,7 +88,7 @@ export function parse(text = "") {
 
     // Attempt to filter out duplicates for each source.
     try {
-      const key = JSON.stringify(result)
+      const key = JSON.stringify(result).toLowerCase()
 
       map.set(key, result)
     } catch {}
